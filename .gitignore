@@ -31,3 +31,11 @@ postgres_data/
 minio_data/
 redis_data/
 rabbitmq_data/
+
+# Binary
+backend/api
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
