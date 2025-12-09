@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	_ "github.com/lib/pq"
 	"github.com/rhblitstein/cad-version-control/internal/handlers"
 	"github.com/rhblitstein/cad-version-control/internal/repository"
 	"github.com/rhblitstein/cad-version-control/internal/storage"
