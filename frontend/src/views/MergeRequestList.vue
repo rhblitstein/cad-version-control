@@ -87,31 +87,128 @@
       <p class="text-gray-600 mb-4">Create your first merge request to start reviewing changes</p>
     </div>
 
-    <!-- Create MR Modal (simplified) -->
+    <!-- Create MR Modal -->
     <div v-if="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click="showCreateModal = false">
       <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4" @click.stop>
         <h2 class="text-2xl font-bold mb-4">Create Merge Request</h2>
-        <p class="text-gray-600 mb-4">Merge request creation requires backend connection.</p>
-        <button @click="showCreateModal = false" class="btn btn-secondary w-full">
-          Close
-        </button>
+        <form @submit.prevent="createMergeRequest">
+          <div class="mb-4">
+            <label class="label">Project</label>
+            <select v-model="newMR.project_id" required class="input" @change="loadBranches">
+              <option value="">Select project</option>
+              <option v-for="project in projects" :key="project.id" :value="project.id">
+                {{ project.name }}
+              </option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label class="label">Source Branch</label>
+            <select v-model="newMR.source_branch_id" required class="input">
+              <option value="">Select branch</option>
+              <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+                {{ branch.name }}
+              </option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label class="label">Target Branch</label>
+            <select v-model="newMR.target_branch_id" required class="input">
+              <option value="">Select branch</option>
+              <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+                {{ branch.name }}
+              </option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label class="label">Title</label>
+            <input v-model="newMR.title" type="text" required class="input" placeholder="Merge feature into main">
+          </div>
+          <div class="mb-4">
+            <label class="label">Description</label>
+            <textarea v-model="newMR.description" rows="3" class="input" placeholder="What changes does this include?"></textarea>
+          </div>
+          <div class="mb-6">
+            <label class="label">Author</label>
+            <input v-model="newMR.author" type="email" required class="input" placeholder="you@example.com">
+          </div>
+          <div class="flex justify-end space-x-3">
+            <button type="button" @click="showCreateModal = false" class="btn btn-secondary">Cancel</button>
+            <button type="submit" class="btn btn-primary" :disabled="creating">
+              {{ creating ? 'Creating...' : 'Create' }}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { mergeRequestsAPI } from '../api/client'
+import { ref, onMounted } from 'vue'
+import { mergeRequestsAPI, projectsAPI, branchesAPI } from '../api/client'
 
 const loading = ref(false)
+const creating = ref(false)
 const mergeRequests = ref([])
+const projects = ref([])
+const branches = ref([])
 const filter = ref('all')
 const showCreateModal = ref(false)
 
+const newMR = ref({
+  project_id: '',
+  source_branch_id: '',
+  target_branch_id: '',
+  title: '',
+  description: '',
+  author: '',
+})
+
 onMounted(() => {
   fetchMergeRequests()
+  fetchProjects()
 })
+
+const fetchProjects = async () => {
+  try {
+    const response = await projectsAPI.list()
+    projects.value = response.data.projects || []
+  } catch (error) {
+    console.error('Failed to fetch projects:', error)
+  }
+}
+
+const loadBranches = async () => {
+  if (!newMR.value.project_id) return
+  try {
+    const response = await branchesAPI.list(newMR.value.project_id)
+    branches.value = response.data.branches || []
+  } catch (error) {
+    console.error('Failed to fetch branches:', error)
+  }
+}
+
+const createMergeRequest = async () => {
+  creating.value = true
+  try {
+    await mergeRequestsAPI.create(newMR.value)
+    showCreateModal.value = false
+    newMR.value = {
+      project_id: '',
+      source_branch_id: '',
+      target_branch_id: '',
+      title: '',
+      description: '',
+      author: '',
+    }
+    await fetchMergeRequests()
+  } catch (error) {
+    console.error('Failed to create merge request:', error)
+    alert('Failed to create merge request. Check console for details.')
+  } finally {
+    creating.value = false
+  }
+}
 
 const fetchMergeRequests = async () => {
   loading.value = true
