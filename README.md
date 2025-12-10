@@ -1,9 +1,9 @@
 # CAD Version Control System
 
-> A Git-like version control system for CAD files, built with Go, Vue.js, PostgreSQL, and MinIO, based on Allspice.io. 
+> A Git-like version control system for CAD files, built with Go, Vue.js, PostgreSQL, and MinIO, inspired by [AllSpice.io](https://allspice.io).
 
 ![Project Dashboard](https://img.shields.io/badge/Status-Demo%20Ready-brightgreen)
-![Go Version](https://img.shields.io/badge/Go-1.25.5-00ADD8?logo=go)
+![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)
 ![Vue Version](https://img.shields.io/badge/Vue-3-4FC08D?logo=vue.js)
 
 ## 🎯 Overview
@@ -17,7 +17,35 @@ This system brings Git-like version control to CAD workflows, enabling teams to:
 
 ## 📸 Screenshots
 
-[TO BE ADDED]
+### Project Dashboard
+Manage all your CAD projects in one place with an intuitive card-based interface.
+
+![Project List](docs/images/01-project-list.png)
+
+### Create New Project
+Start a new CAD project with a name and description.
+
+![Create Project](docs/images/02-create-project.png)
+
+### Commit Changes
+Upload STL files with commit messages, just like Git.
+
+![New Commit](docs/images/03-new-commit.png)
+
+### Create Merge Request
+Request to merge changes from one branch to another, with automatic conflict detection.
+
+![Create Merge Request](docs/images/04-create-merge-request.png)
+
+### Review Conflicts
+See detected conflicts with options to view 3D diffs or mark as resolved.
+
+![Merge Request Detail](docs/images/05-merge-request-detail.png)
+
+### 3D Diff Viewer
+Side-by-side 3D comparison of CAD files with synchronized camera controls.
+
+![3D Diff Viewer](docs/images/06-3d-diff-viewer.png)
 
 ## 🏗️ Architecture
 
@@ -41,7 +69,7 @@ This system brings Git-like version control to CAD workflows, enabling teams to:
 ### Tech Stack
 
 **Backend:**
-- **Go 1.25.5** - High-performance API server
+- **Go 1.21+** - High-performance API server
 - **Chi Router** - Lightweight HTTP router
 - **PostgreSQL 15** - ACID-compliant version history
 - **MinIO** - S3-compatible object storage
@@ -66,7 +94,7 @@ This system brings Git-like version control to CAD workflows, enabling teams to:
 
 - Docker Desktop or Colima
 - Node.js 18+ (via NVM recommended)
-- Go 1.25.5+ (optional, for local development)
+- Go 1.21+ (optional, for local development)
 
 ### Installation
 
@@ -267,31 +295,27 @@ docker-compose down -v
 - `GET /api/conflicts/{id}/diff` - Get geometric diff
 - `POST /api/conflicts/{id}/resolve` - Mark resolved
 
-[Full API documentation](API.md)
-
 ## 🎓 Design Decisions
 
 ### Why STL instead of native CAD?
-**Demo:** STL files are triangle meshes - simple to parse and render in browsers with Three.js
+**Demo:** STL files are triangle meshes - simple to parse and render in browsers with Three.js.
 
-**Production:** Would need geometry kernels (Parasolid, OpenCascade) to parse native CAD formats (STEP, SOLIDWORKS) and preserve parametric design intent
+**Production:** Would need geometry kernels (Parasolid, OpenCascade) to parse native CAD formats (STEP, SOLIDWORKS) and preserve parametric design intent.
 
 ### Why checksum-based diffing?
-**Demo:** SHA-256 comparison is fast and reliable for detecting changes
+**Demo:** SHA-256 comparison is fast and reliable for detecting changes.
 
-**Production:** Would add geometric analysis to quantify changes (vertices moved, faces added/removed) and enable intelligent auto-merging
+**Production:** Would add geometric analysis to quantify changes (vertices moved, faces added/removed) and enable intelligent auto-merging.
 
 ### Why manual conflict resolution?
-**Demo:** Keeps logic simple - user chooses which version to keep
+**Demo:** Keeps logic simple - user chooses which version to keep.
 
-**Production:** Could implement 3-way geometric merging for non-overlapping changes, similar to Git's text merging but for 3D geometry
+**Production:** Could implement 3-way geometric merging for non-overlapping changes, similar to Git's text merging but for 3D geometry.
 
 ### Why single Postgres instance?
-**Demo:** Simple deployment, ACID guarantees for correctness
+**Demo:** Simple deployment, ACID guarantees for correctness.
 
-**Production:** Would add read replicas for scaling, partitioning for large tables, and connection pooling (PgBouncer)
-
-**See full design rationale:** [Technical Documentation](https://polyester-droplet-069.notion.site/Allspice-POC-Design-Docs-2c12dbf66655804f8a44c7bc55088f0f)
+**Production:** Would add read replicas for scaling, partitioning for large tables, and connection pooling (PgBouncer).
 
 ## 🚧 Known Limitations
 
@@ -329,30 +353,6 @@ npm run test
 ./scripts/integration_test.sh
 ```
 
-## 📦 Deployment
-
-### Docker Compose (Simple)
-```bash
-docker-compose -f docker-compose.prod.yml up -d
-```
-
-### Kubernetes (Production)
-```bash
-kubectl apply -f k8s/
-```
-
-[Deployment guide](DEPLOYMENT.md)
-
-## 🤝 Contributing
-
-This is a demonstration project. If you'd like to extend it:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
-
 ## 👤 Author
 
 **Rebecca Blitstein**
@@ -361,16 +361,14 @@ This is a demonstration project. If you'd like to extend it:
 
 ## 🙏 Acknowledgments
 
-- Built as a technical demonstration for interview preparation for Allspice.io
+- Built as a technical demonstration for AllSpice.io
 - Thanks to the Go, Vue, and Three.js communities
 
 ---
 
-**⚡ Pro Tip:** This system demonstrates understanding of:
+**⚡ This project demonstrates:**
 - Distributed version control (Git internals)
-- 3D geometry handling
+- 3D geometry handling and visualization
 - Real-time collaboration patterns
 - Scalable architecture design
-- Modern web development practices
-
-For deeper technical analysis, see the [full documentation](https://polyester-droplet-069.notion.site/Allspice-POC-Design-Docs-2c12dbf66655804f8a44c7bc55088f0f).
+- Modern full-stack development (Go + Vue + PostgreSQL)

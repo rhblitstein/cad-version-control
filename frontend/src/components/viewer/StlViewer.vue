@@ -135,10 +135,17 @@ const loadModel = async () => {
 
   const loader = new STLLoader()
   
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+  const fullUrl = props.fileUrl.startsWith('http') 
+    ? props.fileUrl 
+    : `${API_BASE}${props.fileUrl}`
+  
+  console.log('Loading STL from:', fullUrl)
+  
   try {
     const geometry = await new Promise((resolve, reject) => {
       loader.load(
-        props.fileUrl,
+        fullUrl,
         (geo) => resolve(geo),
         undefined,
         (error) => reject(error)

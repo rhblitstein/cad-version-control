@@ -158,7 +158,8 @@ func (r *MergeRequestRepository) CreateConflict(ctx context.Context, conflict *m
 
 func (r *MergeRequestRepository) GetConflicts(ctx context.Context, mrID uuid.UUID) ([]models.MergeConflict, error) {
 	query := `
-		SELECT id, merge_request_id, file_id, source_version_id, target_version_id, status, resolution_notes, resolved_at
+		SELECT id, merge_request_id, file_id, source_version_id, target_version_id, status, 
+	       	COALESCE(resolution_notes, '') as resolution_notes, resolved_at
 		FROM merge_conflicts
 		WHERE merge_request_id = $1
 	`
@@ -193,7 +194,8 @@ func (r *MergeRequestRepository) GetConflicts(ctx context.Context, mrID uuid.UUI
 
 func (r *MergeRequestRepository) GetConflictByID(ctx context.Context, id uuid.UUID) (*models.MergeConflict, error) {
 	query := `
-		SELECT id, merge_request_id, file_id, source_version_id, target_version_id, status, resolution_notes, resolved_at
+		SELECT id, merge_request_id, file_id, source_version_id, target_version_id, status, 
+		       COALESCE(resolution_notes, '') as resolution_notes, resolved_at
 		FROM merge_conflicts
 		WHERE id = $1
 	`
@@ -206,7 +208,7 @@ func (r *MergeRequestRepository) GetConflictByID(ctx context.Context, id uuid.UU
 		&c.SourceVersionID,
 		&c.TargetVersionID,
 		&c.Status,
-		&c.ResolutionNotes,
+		&c.ResolutionNotes, // Now handles empty string
 		&c.ResolvedAt,
 	)
 
